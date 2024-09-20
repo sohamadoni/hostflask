@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Phishing Detection Results</title>
+</head>
+<body>
+    <h1>Phishing Detection Results</h1>
+
+    <p><strong>Email Content:</strong></p>
+    <pre>{{ email_content }}</pre> <!-- Display raw email content in preformatted text -->
+
+    <p><strong>Detection Result:</strong> {{ result }}</p>
+
+    {% if reasons %}
+    <h3>Reasons for Detection:</h3>
+    <ul>
+        {% for reason in reasons %}
+        <li>{{ reason }}</li>
+        {% endfor %}
+    </ul>
+    {% endif %}
+
+    <a href="/">Go Back</a>
+</body>
+</html>
