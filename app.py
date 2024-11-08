@@ -1,4 +1,4 @@
-from flask import Flask, request, render_template, make_response, session
+from flask import Flask, request, render_template, make_response
 import imaplib
 import email
 import re
@@ -7,7 +7,6 @@ app = Flask(__name__)
 app.secret_key = 'your_secret_key'  # Used for session management
 
 phishing_keywords = ['account', 'bank', 'verify', 'password', 'click', 'login', 'update', 'security']
-
 
 # Helper functions
 def contains_suspicious_url(email_content):
@@ -18,22 +17,20 @@ def contains_suspicious_url(email_content):
             return True
     return False
 
-
-def contains_phishing_content(email_content, custom_keywords):
-    for keyword in phishing_keywords + custom_keywords:
+def contains_phishing_content(email_content):
+    for keyword in phishing_keywords:
         if keyword in email_content.lower():
             return keyword  # Return the keyword that was detected
     return None
 
-
-def detect_phishing(subject, email_content, custom_keywords):
+def detect_phishing(subject, email_content):
     reasons = []
     
     if contains_suspicious_url(email_content):
         reasons.append("Suspicious URL found")
 
-    keyword_in_subject = contains_phishing_content(subject, custom_keywords)
-    keyword_in_body = contains_phishing_content(email_content, custom_keywords)
+    keyword_in_subject = contains_phishing_content(subject)
+    keyword_in_body = contains_phishing_content(email_content)
     
     if keyword_in_subject:
         reasons.append(f"Phishing keyword found in subject: {keyword_in_subject}")
@@ -44,8 +41,7 @@ def detect_phishing(subject, email_content, custom_keywords):
         return "Phishing Detected", reasons
     return "No Phishing Detected", reasons
 
-
-# Email fetching function (modified to take email and password as parameters)
+# Email fetching function
 def fetch_email_content(email_address, password):
     try:
         imap_url = 'imap.gmail.com'
@@ -86,7 +82,6 @@ def fetch_email_content(email_address, password):
     except Exception as e:
         return None, None, str(e)
 
-
 # Main route for the form and email check
 @app.route("/", methods=['GET', 'POST'])
 def index():
@@ -105,14 +100,13 @@ def index():
     if request.method == 'POST':
         email = request.form['email']
         password = request.form['password']
-        custom_keywords = request.form['keywords'].split(',') if request.form['keywords'] else []
         remember_me = request.form.get('remember_me')
 
         # Fetch the email content
         subject, email_content, error = fetch_email_content(email, password)
 
         if error is None:
-            result, reasons = detect_phishing(subject, email_content, custom_keywords)
+            result, reasons = detect_phishing(subject, email_content)
 
             # Set cookies if 'Remember Me' is checked
             resp = make_response(render_template('result.html', subject=subject, email_content=email_content, result=result, reasons=reasons))
@@ -129,7 +123,6 @@ def index():
             result = "Error fetching emails"
 
     return render_template('index.html', email=email, password=password, result=result, error=error, reasons=reasons)
-
 
 if __name__ == "__main__":
     app.run(debug=True)
