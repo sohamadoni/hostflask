@@ -4,134 +4,38 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Email Phishing Detection</title>
-    <style>
-        body {
-            font-family: 'Arial', sans-serif;
-            background-color: #f4f7f6;
-            color: #333;
-            padding: 20px;
-            max-width: 500px;
-            margin: 0 auto;
-        }
-    
-        h1 {
-            text-align: center;
-            color: #4CAF50;
-        }
-    
-        form {
-            background-color: #fff;
-            padding: 20px 20px 20px 20px;
-            border-radius: 8px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-        }
-    
-        label {
-            font-weight: bold;
-            color: #333;
-            margin-bottom: 5px;
-            display: block;
-        }
-    
-        input[type="email"],
-        input[type="password"],
-        input[type="text"] {
-            width: 100%;
-            padding: 10px;
-            margin: 10px 0;
-            border-radius: 5px;
-            border: 1px solid #ccc;
-            font-size: 16px;
-        }
-    
-        input[type="checkbox"] {
-            margin-right: 5px;
-        }
-    
-        button {
-            background-color: #4CAF50;
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 16px;
-            width: 100%;
-        }
-    
-        button:hover {
-            background-color: #45a049;
-        }
-    
-        p {
-            font-size: 14px;
-        }
-    
-        p strong {
-            font-size: 16px;
-            color: #333;
-        }
-    
-        p.error {
-            color: red;
-            text-align: center;
-        }
-    </style>
-    
 </head>
 <body>
     <h1>Email Phishing Detection</h1>
 
     {% if error %}
-    <p style="color: red;">{{ error }}</p>
+        <p style="color: red;">{{ error }}</p>
     {% endif %}
 
     <form method="POST" action="/">
-        <label for="email">Gmail Address:</label><br>
+        <label for="email">Email:</label>
         <input type="email" id="email" name="email" value="{{ email }}" required><br><br>
 
-        <label for="password">App Password:</label><br>
+        <label for="password">Password:</label>
         <input type="password" id="password" name="password" value="{{ password }}" required><br><br>
 
-        <label for="keywords">Custom Phishing Keywords (comma-separated):</label><br>
-        <input type="text" id="keywords" name="keywords" placeholder="e.g., transaction, invoice, urgent"><br><br>
+        <label>
+            <input type="checkbox" name="remember_me"> Remember Me
+        </label><br><br>
 
-        <input type="checkbox" id="remember_me" name="remember_me">
-        <label for="remember_me">Remember Me</label><br><br>
-
-        <button type="submit">Check Email</button>
+        <button type="submit">Check for Phishing</button>
     </form>
 
     {% if result %}
-    <p><strong>Result:</strong> {{ result }}</p>
+        <h2>Result: {{ result }}</h2>
+        {% if reasons %}
+            <h3>Reasons:</h3>
+            <ul>
+                {% for reason in reasons %}
+                    <li>{{ reason }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
     {% endif %}
-    <script>
-        // Function to handle 'Remember Me' functionality using local storage
-        window.onload = function() {
-            // Retrieve remembered email and password from local storage
-            if (localStorage.getItem('rememberMe') === 'true') {
-                document.getElementById('email').value = localStorage.getItem('email');
-                document.getElementById('password').value = localStorage.getItem('password');
-                document.getElementById('remember_me').checked = true;
-            }
-    
-            document.querySelector('form').addEventListener('submit', function(e) {
-                const rememberMe = document.getElementById('remember_me').checked;
-                const email = document.getElementById('email').value;
-                const password = document.getElementById('password').value;
-    
-                if (rememberMe) {
-                    localStorage.setItem('rememberMe', 'true');
-                    localStorage.setItem('email', email);
-                    localStorage.setItem('password', password);
-                } else {
-                    localStorage.removeItem('rememberMe');
-                    localStorage.removeItem('email');
-                    localStorage.removeItem('password');
-                }
-            });
-        };
-    </script>
-    
 </body>
 </html>
